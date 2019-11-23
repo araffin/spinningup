@@ -2,8 +2,49 @@ import numpy as np
 import tensorflow as tf
 import scipy.signal
 from gym.spaces import Box, Discrete
+from tensorflow.keras import Model
+from tensorflow.keras.models import Sequential
+import tensorflow_probability as tfp
 
 EPS = 1e-8
+
+class VPGPolicy(Model):
+    def __init__(self, obs_dim, act_dim, hidden_sizes=(64,64), activation='tanh',
+                  output_activation=None, policy=None, action_space=None):
+        super(VPGPolicy, self).__init__()
+        if isinstance(action_space, Box):
+            raise NotImplementedError()
+        elif isinstance(action_space, Discrete):
+            pass
+
+        self.policy = Sequential()
+        self.policy.add(tf.keras.layers.Flatten(input_shape=obs_dim, dtype=tf.float32))
+
+        for n_hidden in hidden_sizes:
+            self.policy.add(tf.keras.layers.Dense(n_hidden, activation=activation))
+        self.policy.add(tf.keras.layers.Dense(act_dim, activation=None))
+
+        self.value = Sequential()
+        self.value.add(tf.keras.layers.Flatten(input_shape=obs_dim, dtype=tf.float32))
+
+        for n_hidden in hidden_sizes:
+            self.value.add(tf.keras.layers.Dense(n_hidden, activation=activation))
+        self.value.add(tf.keras.layers.Dense(1, activation=None))
+
+    def evaluate_actions(self, obs, actions):
+        dist = tfp.distributions.Categorical(logits=self.policy(obs))
+        return dist.log_prob(actions)
+
+    def sample(self, x):
+        dist = tfp.distributions.Categorical(logits=self.policy(x))
+        return dist.sample().numpy()
+
+    def value_forward(self, x):
+        return self.value(x)
+
+    def call(self, x):
+        return self.sample(x), self.value_forward(x).numpy()
+
 
 def combined_shape(length, shape=None):
     if shape is None:
@@ -46,14 +87,14 @@ def discount_cumsum(x, discount):
     """
     magic from rllab for computing discounted cumulative sums of vectors.
 
-    input: 
-        vector x, 
-        [x0, 
-         x1, 
+    input:
+        vector x,
+        [x0,
+         x1,
          x2]
 
     output:
-        [x0 + discount * x1 + discount^2 * x2,  
+        [x0 + discount * x1 + discount^2 * x2,
          x1 + discount * x2,
          x2]
     """
@@ -88,7 +129,7 @@ def mlp_gaussian_policy(x, a, hidden_sizes, activation, output_activation, actio
 """
 Actor-Critics
 """
-def mlp_actor_critic(x, a, hidden_sizes=(64,64), activation=tf.tanh, 
+def mlp_actor_critic(x, a, hidden_sizes=(64,64), activation=tf.tanh,
                      output_activation=None, policy=None, action_space=None):
 
     # default policy builder depends on action space

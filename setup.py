@@ -12,7 +12,7 @@ with open(join("spinup", "version.py")) as version_file:
 setup(
     name='spinup',
     py_modules=['spinup'],
-    version=__version__,#'0.1',
+    version=__version__,
     install_requires=[
         'cloudpickle',
         'gym[atari,box2d,classic_control]>=0.10.8',
@@ -25,9 +25,10 @@ setup(
         'pytest',
         'psutil',
         'scipy',
-        'seaborn==0.8.1',
+        'seaborn',
         'tensorflow>=2.0',
-        'tqdm'
+        'tqdm',
+        'tensorflow_probability'
     ],
     extras_require={'mujoco': 'mujoco-py==2.0.2.7'},
     description="Teaching tools for introducing people to deep RL.",
