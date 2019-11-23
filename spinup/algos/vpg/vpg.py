@@ -90,8 +90,8 @@ Vanilla Policy Gradient
 
 """
 def vpg(env_fn, actor_critic=core.VPGPolicy, ac_kwargs=dict(), seed=0,
-        steps_per_epoch=4000, epochs=50, gamma=0.99, pi_lr=7e-4,
-        vf_lr=7e-4, train_v_iters=1, lam=0.97, max_ep_len=1000,
+        steps_per_epoch=4000, epochs=50, gamma=0.99, pi_lr=3e-4,
+        vf_lr=3e-4, train_v_iters=2, lam=0.97, max_ep_len=1000,
         logger_kwargs=dict(), save_freq=10):
     """
 
@@ -155,7 +155,7 @@ def vpg(env_fn, actor_critic=core.VPGPolicy, ac_kwargs=dict(), seed=0,
     logger.save_config(locals())
 
     seed += 10000 * proc_id()
-    # tf.set_random_seed(seed)
+    tf.random.set_seed(seed)
     np.random.seed(seed)
 
     env = env_fn()
@@ -268,7 +268,7 @@ if __name__ == '__main__':
     parser.add_argument('--l', type=int, default=2)
     parser.add_argument('--gamma', type=float, default=0.99)
     parser.add_argument('--seed', '-s', type=int, default=0)
-    parser.add_argument('--cpu', type=int, default=4)
+    parser.add_argument('--cpu', type=int, default=1)
     parser.add_argument('--steps', type=int, default=8)
     parser.add_argument('--epochs', type=int, default=50)
     parser.add_argument('--exp_name', type=str, default='vpg')
