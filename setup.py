@@ -14,11 +14,11 @@ setup(
     py_modules=['spinup'],
     version=__version__,#'0.1',
     install_requires=[
-        'cloudpickle==1.2.1',
+        'cloudpickle',
         'gym[atari,box2d,classic_control]>=0.10.8',
         'ipython',
         'joblib',
-        'matplotlib==3.1.1',
+        'matplotlib',
         'mpi4py',
         'numpy',
         'pandas',
@@ -26,7 +26,7 @@ setup(
         'psutil',
         'scipy',
         'seaborn==0.8.1',
-        'tensorflow>=1.8.0,<2.0',
+        'tensorflow>=2.0',
         'tqdm'
     ],
     extras_require={'mujoco': 'mujoco-py==2.0.2.7'},
